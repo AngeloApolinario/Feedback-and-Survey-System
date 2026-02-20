@@ -33,13 +33,19 @@ export default {
   getSurveyAnalytics(id) {
     return apiClient.get(`/surveys/${id}/analytics`);
   },
-  submitAnswer(data) {
-    return apiClient.post("/surveys/answer", data);
-  },
   updateSurvey(id, data) {
     return apiClient.put(`/surveys/${id}`, data);
   },
   deleteSurvey(id) {
     return apiClient.delete(`/surveys/${id}`);
+  },
+  getSurveyById(id) {
+    // Use apiClient instead of axios
+    return apiClient.get(`/surveys/${id}`);
+  },
+
+  submitAnswer(payload) {
+    // Use apiClient instead of axios
+    return apiClient.post("/surveys/answer", payload);
   },
 };

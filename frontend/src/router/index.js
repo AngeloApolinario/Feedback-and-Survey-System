@@ -8,6 +8,11 @@ const routes = [
   { path: "/login", component: Login },
   { path: "/register", component: Register },
   {
+    path: "/survey/:id",
+    name: "SurveyRedirect",
+    component: () => import("../views/SurveyPublic.vue"),
+  },
+  {
     path: "/dashboard",
     component: Dashboard,
     beforeEnter: (to, from, next) => {

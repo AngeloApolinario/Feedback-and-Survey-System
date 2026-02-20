@@ -16,7 +16,6 @@ const handleRegister = async () => {
     await api.register(form.value);
     isSuccess.value = true;
     
-    // Smooth transition to login after showing success state
     setTimeout(() => {
       router.push('/login');
     }, 1500);

@@ -6,16 +6,27 @@ const surveyController = require("../controller/surveyController");
 
 router.post("/create", verify, async (req, res) => {
   try {
+    const { title, description, questions, isPublic, acceptingResponses } =
+      req.body;
+
     const newSurvey = new Survey({
       creator: req.user._id,
-      title: req.body.title,
-      description: req.body.description,
-      questions: req.body.questions,
+      title,
+      description,
+      questions,
+
+      isPublic: isPublic !== undefined ? isPublic : true,
+      acceptingResponses:
+        acceptingResponses !== undefined ? acceptingResponses : true,
     });
+
     const savedSurvey = await newSurvey.save();
     res.status(201).send(savedSurvey);
   } catch (err) {
-    res.status(400).send({ message: "Error saving survey", error: err });
+    console.error("Create Error:", err);
+    res
+      .status(400)
+      .send({ message: "Error saving survey", error: err.message });
   }
 });
 
@@ -46,7 +57,7 @@ router.get("/dashboard", verify, async (req, res) => {
   }
 });
 
-// --- UTILS ---
+
 router.delete("/:id", verify, async (req, res) => {
   try {
     const survey = await Survey.findById(req.params.id);
@@ -75,5 +86,7 @@ router.put("/:id", verify, async (req, res) => {
     res.status(400).send(err);
   }
 });
+
+
 
 module.exports = router;

@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import api from '../services/api';
 
 const router = useRouter();
+const route = useRoute(); 
 const form = ref({ email: '', password: '' });
 const error = ref('');
 const isSubmitting = ref(false);
@@ -12,10 +13,14 @@ const handleLogin = async () => {
   isSubmitting.value = true;
   error.value = '';
   try {
-    const res = await api.login(form.value);
-    const token = res.data.token || res.data; 
-    localStorage.setItem('token', token);
-    router.push('/dashboard');
+   
+    const res = await api.login(form.value); 
+    
+    localStorage.setItem('token', res.data.token);
+    
+   
+    const destination = route.query.redirect || '/dashboard';
+    router.push(destination);
   } catch (err) {
     error.value = err.response?.data?.error || err.response?.data || "Invalid Credentials";
   } finally {
@@ -120,7 +125,7 @@ const handleLogin = async () => {
   40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
-/* Smooth Pulse for BG Glow */
+
 @keyframes pulse {
   0%, 100% { opacity: 0.2; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(1.1); }
