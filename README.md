@@ -52,7 +52,7 @@ SurveyHub is a high-performance, full-stack survey platform built for modern dat
 
 ---
 
-##  How to Use SurveyHub
+## How to Use SurveyHub
 
 ### **Step 1: The Design Phase (Creator Mode)**
 
@@ -74,7 +74,7 @@ SurveyHub is a high-performance, full-stack survey platform built for modern dat
 
 ---
 
-## 💎 Pro UX Features
+## Pro UX Features
 
 - **Skeleton Loading:** No more jarring white screens; the app uses pulse-animations during data fetch.
 - **Smart Search:** Use the header search bar to filter through hundreds of surveys instantly.
@@ -82,6 +82,10 @@ SurveyHub is a high-performance, full-stack survey platform built for modern dat
 - **Empty States:** Custom illustrations and call-to-actions appear when no data is available.
 
 ---
+
+## Security Note
+
+This application uses JWT (JSON Web Tokens) stored in localStorage. Ensure that for production environments, you implement httpOnly cookies and CSRF protection for maximum security.
 
 ## Project Structure
 
