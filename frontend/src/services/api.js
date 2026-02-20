@@ -26,9 +26,12 @@ export default {
   createSurvey(data) {
     return apiClient.post("/surveys/create", data);
   },
-
   getDashboardData() {
     return apiClient.get("/surveys/dashboard");
+  },
+
+  getSurveyAnalytics(id) {
+    return apiClient.get(`/surveys/${id}/analytics`);
   },
   submitAnswer(data) {
     return apiClient.post("/surveys/answer", data);

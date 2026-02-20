@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const verify = require("./verifyToken");
-//MODELS
 const Survey = require("../models/Survey");
 const Response = require("../models/Response");
+const surveyController = require("../controller/surveyController");
 
 router.post("/create", verify, async (req, res) => {
   try {
@@ -12,7 +12,6 @@ router.post("/create", verify, async (req, res) => {
       description: req.body.description,
       questions: req.body.questions,
     });
-
     const savedSurvey = await newSurvey.save();
     res.status(201).send(savedSurvey);
   } catch (err) {
@@ -20,53 +19,43 @@ router.post("/create", verify, async (req, res) => {
   }
 });
 
-router.post("/answer", verify, async (req, res) => {
-  try {
-    const newResponse = new Response({
-      surveyId: req.body.surveyId,
-      respondentId: req.user._id,
-      answers: req.body.answers,
-    });
-    await newResponse.save();
-    res.status(201).send("Response saved successfully");
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
+router.get("/:id/analytics", verify, surveyController.getSurveyAnalytics);
+
+router.post("/answer", verify, surveyController.submitAnswer);
 
 router.get("/dashboard", verify, async (req, res) => {
   try {
-    const explore = await Survey.find({
-      creator: { $ne: req.user._id },
-    }).populate("creator", "username");
+    const userId = req.user._id;
 
-    const mySurveys = await Survey.find({ creator: req.user._id });
+    const exploreSurveys = await Survey.find({ creator: { $ne: userId } })
+      .populate("creator", "username")
+      .lean();
+    const mySurveys = await Survey.find({ creator: userId }).lean();
 
-    res.json({ explore, mySurveys });
+    const userResponses = await Response.find({ user: userId }, "surveyId");
+    const respondedSurveyIds = userResponses.map((r) => r.surveyId.toString());
+
+    const exploreWithStatus = exploreSurveys.map((s) => ({
+      ...s,
+      hasResponded: respondedSurveyIds.includes(s._id.toString()),
+    }));
+
+    res.json({ explore: exploreWithStatus, mySurveys });
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-router.get("/", async (req, res) => {
-  try {
-    const surveys = await Survey.find().sort({ createdAt: -1 });
-    res.json(surveys);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
+// --- UTILS ---
 router.delete("/:id", verify, async (req, res) => {
   try {
     const survey = await Survey.findById(req.params.id);
+    if (!survey) return res.status(404).send("Not found");
     if (survey.creator.toString() !== req.user._id)
       return res.status(401).send("Unauthorized");
 
     await Survey.findByIdAndDelete(req.params.id);
-
     await Response.deleteMany({ surveyId: req.params.id });
-
     res.send("Survey and its data deleted");
   } catch (err) {
     res.status(400).send(err);
@@ -78,7 +67,6 @@ router.put("/:id", verify, async (req, res) => {
     const survey = await Survey.findById(req.params.id);
     if (survey.creator.toString() !== req.user._id)
       return res.status(401).send("Unauthorized");
-
     const updated = await Survey.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });

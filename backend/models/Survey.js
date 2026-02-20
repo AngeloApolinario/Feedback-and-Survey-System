@@ -1,20 +1,22 @@
 const mongoose = require("mongoose");
 
-const surveySchema = new mongoose.Schema({
-  creator: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const questionSchema = new mongoose.Schema({
+  questionText: { type: String, required: true },
+  type: {
+    type: String,
+    enum: ["multiple-choice", "checkbox", "text"],
+    default: "multiple-choice",
   },
-  title: { type: String, required: true },
-  description: { type: String },
-  questions: [
-    {
-      questionText: { type: String, required: true },
-      options: [String],
-    },
-  ],
-  createdAt: { type: Date, default: Date.now },
+  options: [String],
 });
 
+const surveySchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  questions: [questionSchema],
+  creator: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
+  totalResponses: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now },
+});
 module.exports = mongoose.model("Survey", surveySchema);
