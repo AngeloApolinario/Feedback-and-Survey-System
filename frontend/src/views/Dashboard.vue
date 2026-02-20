@@ -173,7 +173,7 @@ const handleLogout = () => {
   router.push('/login');
 };
 
-import { nextTick } from 'vue'; /
+import { nextTick } from 'vue'; 
 
 const checkAutoOpen = async () => {
   const autoOpenId = route.query.open;
